@@ -66,6 +66,23 @@ body{
     font-size: 1.2rem;
     margin-right: 1rem;
 }
+.facebook-icon i {
+  color: #1877F2; /* Facebook blue */
+}
+
+.instagram-icon i {
+  color: #E1306C; /* Instagram pinkish */
+}
+
+.linkedin-icon i {
+  color: #0A66C2; /* LinkedIn blue */
+}
+
+.f-info-socials i:hover {
+  transform: scale(1.2);
+  transition: all 0.3s ease;
+}
+
 .f-info{
     text-align: center;
     height: 8rem;
