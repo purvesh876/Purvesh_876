@@ -9,11 +9,7 @@ const listingSchema=new Schema({
         required:true,
     },
     description:String,
-    // image: {
-    //     type:String,
-    //     default:"https://www.cvvillas.com/dynamic-images/5000-5999/5301/5301_c=(0,239,3746,2106)_w=1366_h=768.webp?v=202405071552",
-    //     set: (v) => v === "" ? "https://www.cvvillas.com/dynamic-images/5000-5999/5301/5301_c=(0,239,3746,2106)_w=1366_h=768.webp?v=202405071552" :v,
-    // },
+    
     image:{
         url:String,
         filename:String,
@@ -22,6 +18,12 @@ const listingSchema=new Schema({
     price:Number,
     location:String,
     country:String,
+    category: {
+  type: String,
+  enum: ['Adventure', 'Beach', 'Luxury', 'Budget', 'Romantic', 'Mountain', 'Forest', 'City', 'Other'],
+  default: 'Other'
+},
+
     reviews:[
         {
         type : Schema.Types.ObjectId,

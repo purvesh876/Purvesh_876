@@ -73,6 +73,68 @@
  -->
 
 
+ <!-- <% layout("/layouts/boilerplate") %>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10 col-12">
+      <h3 class="mb-4 text-center">Create a New Listing</h3>
+
+      <form method="POST" action="/listings" novalidate class="needs-validation" enctype="multipart/form-data">
+        
+      
+        <div class="mb-3">
+          <label for="title" class="form-label">Title</label>
+          <input name="listing[title]" placeholder="Enter a catchy title" type="text" class="form-control" required />
+          <div class="valid-feedback">Title looks good</div>
+        </div>
+
+        
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea name="listing[description]" class="form-control" placeholder="Write a short description..." required></textarea>
+          <div class="invalid-feedback">Please write a short description</div>
+        </div>
+
+        
+        <div class="mb-3">
+          <label for="image" class="form-label">Upload Listing Image</label>
+          <input name="listing[image]" type="file" class="form-control" />
+        </div>
+
+        
+        <div class="row">
+          <div class="mb-3 col-md-4">
+            <label for="price" class="form-label">Price</label>
+            <input name="listing[price]" placeholder="1200" type="text" class="form-control" required />
+            <div class="invalid-feedback">Price should be valid</div>
+          </div>
+
+          <div class="mb-3 col-md-8">
+            <label for="country" class="form-label">Country</label>
+            <input name="listing[country]" placeholder="India" type="text" class="form-control" required />
+            <div class="invalid-feedback">Country name should be valid</div>
+          </div>
+        </div>
+
+        
+        <div class="mb-3">
+          <label for="location" class="form-label">Location</label>
+          <input name="listing[location]" placeholder="Bhandara, Maharashtra" type="text" class="form-control" required />
+          <div class="invalid-feedback">Location should be valid</div>
+        </div>
+
+      
+        <div class="text-center">
+          <button class="btn btn-dark add-btn mt-3 px-5">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+ -->
+
+
  <% layout("/layouts/boilerplate") %>
 
 <div class="container mt-5">
@@ -87,6 +149,24 @@
           <label for="title" class="form-label">Title</label>
           <input name="listing[title]" placeholder="Enter a catchy title" type="text" class="form-control" required />
           <div class="valid-feedback">Title looks good</div>
+        </div>
+
+        <!-- ✅ Category Dropdown -->
+        <div class="mb-3">
+          <label for="category" class="form-label">Category</label>
+          <select name="listing[category]" class="form-select" required>
+            <option value="" disabled selected>Select a category</option>
+            <option value="Adventure">Adventure</option>
+            <option value="Beach">Beach</option>
+            <option value="Luxury">Luxury</option>
+            <option value="Budget">Budget</option>
+            <option value="Romantic">Romantic</option>
+            <option value="Mountain">Mountain</option>
+            <option value="Forest">Forest</option>
+            <option value="City">City</option>
+            <option value="Other">Other</option>
+          </select>
+          <div class="invalid-feedback">Please select a category</div>
         </div>
 
         <!-- Description -->
@@ -132,4 +212,3 @@
     </div>
   </div>
 </div>
-
