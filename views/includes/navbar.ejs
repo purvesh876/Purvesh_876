@@ -4,6 +4,7 @@
     color: #fff;
     border-radius: 25px;
     padding: 0 1rem 0 1rem;
+    transition: background-color 0.3s ease;
   }
    .search-btn:hover{
     background-color: #fe424d;
@@ -22,9 +23,9 @@
   
 </style>
 
-<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
+<nav class="navbar navbar-expand-md bg-white shadow-sm border-bottom sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass"></i></a>
+    <a class="navbar-brand d-flex align-items-center gap-2 fs-5 fw-bold text-danger" href="/listings"><i class="fa-regular fa-compass"></i>AirHub</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" >
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -35,16 +36,18 @@
       
         
       </div>
-      <div class="navbar-nav ms-auto ">
-        <form class="d-flex" role="search">
-      <input class="form-control me-2 search-inp" type="search" placeholder="Search destinations" aria-label="Search"/>
-      <button class="btn search-btn" type="submit">
-        
-        <i class="fa-solid fa-magnifying-glass"></i>Search</button>
+     <div class="d-flex align-items-center gap-3 ms-auto">
+       <form class="d-flex" role="search">
+     <input class="form-control rounded-pill px-4 py-2 border-0 shadow-sm" type="search" placeholder="Search destinations" aria-label="Search"/>
+
+      <button class="btn btn-danger rounded-pill px-4 d-flex align-items-center gap-2" type="submit">
+  <i class="fa-solid fa-magnifying-glass"></i> Search
+</button>
+
     </form>
-      </div>
-      <div class="navbar-nav ms-auto">
-          <a class="nav-link" href="/listings/new">AirHost your home</a>
+      
+      <div class="navbar-nav d-flex align-items-center gap-3">
+          <a class="nav-link" href="/listings/new">AirHub your home</a>
         <% if(!currUser){ %>
            <a class="nav-link "  href="/signup"> <b>Sign up</b></a>
         <a class="nav-link" href="/login"> <b>Log in</b> </a>
@@ -55,6 +58,7 @@
        
         
         
+      </div>
       </div>
     </div>
   </div>
