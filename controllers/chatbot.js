@@ -143,88 +143,6 @@
 //     });
 // };
 
-// const Listing = require('../models/listing');
-
-// module.exports.initChatSocket = (io) => {
-//     io.on('connection', (socket) => {
-//         console.log('✅ New client connected to chatbot');
-
-//         socket.on('userMessage', async (msg) => {
-//             try {
-//                 const userMsg = msg.toLowerCase();
-//                 let query = {};
-
-               
-// const allCategories = await Listing.distinct("category"); 
-// const userMsgLower = msg.toLowerCase();
-
-// const matchedCategory = allCategories.find(cat => userMsgLower.includes(cat.toLowerCase()));
-
-// if (matchedCategory) {
-//     query.category = matchedCategory; 
-// }
-
-
-//                 // --- Price Matching ---
-//                 const underMatch = userMsg.match(/(?:under|below|less than)\s*(\d+)/);
-//                 const overMatch = userMsg.match(/(?:over|above|more than)\s*(\d+)/);
-//                 if (underMatch) {
-//                     query.price = { $lt: parseInt(underMatch[1]) };
-//                 } else if (overMatch) {
-//                     query.price = { $gt: parseInt(overMatch[1]) };
-//                 }
-
-//                 // --- Location Matching ---
-//                 const allLocations = await Listing.distinct("location");
-//                 for (let loc of allLocations) {
-//                     if (userMsg.includes(loc.toLowerCase())) {
-//                         query.location = loc;
-//                         break;
-//                     }
-//                 }
-
-//                 // --- Fetch Listings ---
-//                 const listings = await Listing.find(query).limit(3);
-
-//                 if (listings.length > 0) {
-//                     for (const listing of listings) {
-//                         socket.emit('botReply', {
-//                             type: 'listing',
-//                             listing: {
-//                                 _id: listing._id,
-//                                 title: listing.title,
-//                                 description: listing.description.slice(0, 100) + "...",
-//                                 price: listing.price,
-//                                 image: listing.image.url || listing.image
-//                             }
-//                         });
-//                     }
-
-//                     socket.emit('botReply', {
-//                         type: 'text',
-//                         message: `✅ Found ${listings.length} matching listings.`
-//                     });
-//                 } else {
-//                     socket.emit('botReply', {
-//                         type: 'text',
-//                         message: "❌ No matching listings found. Try keywords like 'village', 'under 3000', or 'goa'."
-//                     });
-//                 }
-//             } catch (err) {
-//                 console.error(err);
-//                 socket.emit('botReply', {
-//                     type: 'text',
-//                     message: "⚠️ Something went wrong while searching listings."
-//                 });
-//             }
-//         });
-
-//         socket.on('disconnect', () => {
-//             console.log('❎ Client disconnected from chatbot');
-//         });
-//     });
-// };
-// controllers/chatbot.js
 const Listing = require('../models/listing');
 
 module.exports.initChatSocket = (io) => {
@@ -233,37 +151,39 @@ module.exports.initChatSocket = (io) => {
 
         socket.on('userMessage', async (msg) => {
             try {
-                const userMsgLower = msg.toLowerCase();
+                const userMsg = msg.toLowerCase();
                 let query = {};
 
-                // Category matching based on DB values
-                const allCategories = await Listing.distinct("category");
-                const matchedCategory = allCategories.find(cat =>
-                    userMsgLower.includes(cat.toLowerCase())
-                );
-                if (matchedCategory) {
-                    query.category = matchedCategory;
-                }
+               
+const allCategories = await Listing.distinct("category"); 
+const userMsgLower = msg.toLowerCase();
 
-                // Price matching
-                const underMatch = userMsgLower.match(/(?:under|below|less than)\s*(\d+)/);
-                const overMatch = userMsgLower.match(/(?:over|above|more than)\s*(\d+)/);
+const matchedCategory = allCategories.find(cat => userMsgLower.includes(cat.toLowerCase()));
+
+if (matchedCategory) {
+    query.category = matchedCategory; 
+}
+
+
+                // --- Price Matching ---
+                const underMatch = userMsg.match(/(?:under|below|less than)\s*(\d+)/);
+                const overMatch = userMsg.match(/(?:over|above|more than)\s*(\d+)/);
                 if (underMatch) {
                     query.price = { $lt: parseInt(underMatch[1]) };
                 } else if (overMatch) {
-                    query.price = { $gt: parseInt(overMatch[2]) };
+                    query.price = { $gt: parseInt(overMatch[1]) };
                 }
 
-                // Location matching from DB values
+                // --- Location Matching ---
                 const allLocations = await Listing.distinct("location");
-                const matchedLocation = allLocations.find(loc =>
-                    userMsgLower.includes(loc.toLowerCase())
-                );
-                if (matchedLocation) {
-                    query.location = matchedLocation;
+                for (let loc of allLocations) {
+                    if (userMsg.includes(loc.toLowerCase())) {
+                        query.location = loc;
+                        break;
+                    }
                 }
 
-                // Query listings
+                // --- Fetch Listings ---
                 const listings = await Listing.find(query).limit(3);
 
                 if (listings.length > 0) {
@@ -275,8 +195,7 @@ module.exports.initChatSocket = (io) => {
                                 title: listing.title,
                                 description: listing.description.slice(0, 100) + "...",
                                 price: listing.price,
-                                location: listing.location,
-                                image: listing.image?.url || listing.image
+                                image: listing.image.url || listing.image
                             }
                         });
                     }
@@ -288,7 +207,7 @@ module.exports.initChatSocket = (io) => {
                 } else {
                     socket.emit('botReply', {
                         type: 'text',
-                        message: "❌ No matching listings found. Try keywords like 'beach', 'mountain', 'under 3000', or 'Goa'."
+                        message: "❌ No matching listings found. Try keywords like 'village', 'under 3000', or 'goa'."
                     });
                 }
             } catch (err) {
@@ -305,4 +224,85 @@ module.exports.initChatSocket = (io) => {
         });
     });
 };
+// controllers/chatbot.js
+// const Listing = require('../models/listing');
+
+// module.exports.initChatSocket = (io) => {
+//     io.on('connection', (socket) => {
+//         console.log('✅ New client connected to chatbot');
+
+//         socket.on('userMessage', async (msg) => {
+//             try {
+//                 const userMsgLower = msg.toLowerCase();
+//                 let query = {};
+
+//                 // Category matching based on DB values
+//                 const allCategories = await Listing.distinct("category");
+//                 const matchedCategory = allCategories.find(cat =>
+//                     userMsgLower.includes(cat.toLowerCase())
+//                 );
+//                 if (matchedCategory) {
+//                     query.category = matchedCategory;
+//                 }
+
+//                 // Price matching
+//                 const underMatch = userMsgLower.match(/(?:under|below|less than)\s*(\d+)/);
+//                 const overMatch = userMsgLower.match(/(?:over|above|more than)\s*(\d+)/);
+//                 if (underMatch) {
+//                     query.price = { $lt: parseInt(underMatch[1]) };
+//                 } else if (overMatch) {
+//                     query.price = { $gt: parseInt(overMatch[2]) };
+//                 }
+
+//                 // Location matching from DB values
+//                 const allLocations = await Listing.distinct("location");
+//                 const matchedLocation = allLocations.find(loc =>
+//                     userMsgLower.includes(loc.toLowerCase())
+//                 );
+//                 if (matchedLocation) {
+//                     query.location = matchedLocation;
+//                 }
+
+//                 // Query listings
+//                 const listings = await Listing.find(query).limit(3);
+
+//                 if (listings.length > 0) {
+//                     for (const listing of listings) {
+//                         socket.emit('botReply', {
+//                             type: 'listing',
+//                             listing: {
+//                                 _id: listing._id,
+//                                 title: listing.title,
+//                                 description: listing.description.slice(0, 100) + "...",
+//                                 price: listing.price,
+//                                 location: listing.location,
+//                                 image: listing.image?.url || listing.image
+//                             }
+//                         });
+//                     }
+
+//                     socket.emit('botReply', {
+//                         type: 'text',
+//                         message: `✅ Found ${listings.length} matching listings.`
+//                     });
+//                 } else {
+//                     socket.emit('botReply', {
+//                         type: 'text',
+//                         message: "❌ No matching listings found. Try keywords like 'beach', 'mountain', 'under 3000', or 'Goa'."
+//                     });
+//                 }
+//             } catch (err) {
+//                 console.error(err);
+//                 socket.emit('botReply', {
+//                     type: 'text',
+//                     message: "⚠️ Something went wrong while searching listings."
+//                 });
+//             }
+//         });
+
+//         socket.on('disconnect', () => {
+//             console.log('❎ Client disconnected from chatbot');
+//         });
+//     });
+// };
 
