@@ -156,43 +156,7 @@ io.on('connection', (socket) => {
 });
 
 
-// Updated bot logic to query MongoDB
-// async function generateBotReply(message) {
-//     const lower = message.toLowerCase();
 
-//     try {
-//         if (lower.includes("goa")) {
-//             const listings = await Listing.find({ location: /goa/i }).limit(3);
-//             if (listings.length === 0) {
-//                 return "Sorry, I couldn't find listings in Goa.";
-//             }
-
-//             let response = "Here are a few listings in Goa:\n";
-//             listings.forEach(l => {
-//                 response += `• ${l.title} - ₹${l.price}/night\n`;
-//             });
-//             return response;
-//         }
-
-//         if (lower.includes("cheap") || lower.includes("budget")) {
-//             const listings = await Listing.find({ price: { $lt: 1000 } }).limit(3);
-//             if (listings.length === 0) {
-//                 return "No budget listings under ₹1000 were found.";
-//             }
-
-//             let response = "Here are a few budget listings:\n";
-//             listings.forEach(l => {
-//                 response += `• ${l.title} - ₹${l.price}/night\n`;
-//             });
-//             return response;
-//         }
-
-//         return "Hi! I'm WanderBot 🤖. Ask me about locations (like Goa), prices (like cheap or budget), or categories.";
-//     } catch (err) {
-//         console.error("Bot MongoDB query failed:", err);
-//         return "Oops! Something went wrong while searching listings.";
-//     }
-// }
 // async function generateBotReply(message) {
 //     const lower = message.toLowerCase();
 
@@ -231,26 +195,96 @@ io.on('connection', (socket) => {
 //         return { type: "text", data: "Oops! Something went wrong while searching listings." };
 //     }
 // }
+// async function generateBotReply(message) {
+//     const lower = message.toLowerCase();
+
+//     try {
+//         let listings = [];
+
+//         if (lower.includes("goa")) {
+//             listings = await Listing.find({ location: /goa/i }).limit(3);
+//         } else if (lower.includes("cheap") || lower.includes("budget")) {
+//             listings = await Listing.find({ price: { $lt: 1000 } }).limit(3);
+//         } else {
+//             listings = await Listing.find({
+//                 $or: [
+//                     { title: { $regex: lower, $options: "i" } },
+//                     { description: { $regex: lower, $options: "i" } },
+//                     { location: { $regex: lower, $options: "i" } },
+//                     { category: { $regex: lower, $options: "i" } }  // ✅ added category search
+//                 ]
+//             }).limit(3);
+//         }
+
+//         if (listings.length === 0) {
+//             return { type: "text", data: "Sorry, no listings matched your query." };
+//         }
+
+//         const structured = listings.map(l => ({
+//             title: l.title,
+//             price: l.price,
+//             location: l.location,
+//             image: l.image?.url || "",  // 🛡️ safe access if image missing
+//             category: l.category || ""  // optional: you can use this in frontend if needed
+//         }));
+
+//         return { type: "listings", data: structured };
+
+//     } catch (err) {
+//         console.error("Bot MongoDB query failed:", err);
+//         return { type: "text", data: "Oops! Something went wrong while searching listings." };
+//     }
+// }
 async function generateBotReply(message) {
     const lower = message.toLowerCase();
 
     try {
-        let listings = [];
+        let query = {};
 
-        if (lower.includes("goa")) {
-            listings = await Listing.find({ location: /goa/i }).limit(3);
-        } else if (lower.includes("cheap") || lower.includes("budget")) {
-            listings = await Listing.find({ price: { $lt: 1000 } }).limit(3);
-        } else {
-            listings = await Listing.find({
+        // Extract price filter
+        const priceMatch = lower.match(/(?:under|less than|below)\s*(\d+)/);
+        if (priceMatch) {
+            const priceValue = parseInt(priceMatch[1]);
+            if (!isNaN(priceValue)) {
+                query.price = { $lt: priceValue };
+            }
+        }
+
+        // Dynamically fetch available categories and locations from DB
+        const [allCategories, allLocations] = await Promise.all([
+            Listing.distinct("category"),
+            Listing.distinct("location")
+        ]);
+
+        // Match category from user input
+        for (const cat of allCategories) {
+            if (lower.includes(cat.toLowerCase())) {
+                query.category = new RegExp(cat, "i");
+                break;
+            }
+        }
+
+        // Match location from user input
+        for (const loc of allLocations) {
+            if (lower.includes(loc.toLowerCase())) {
+                query.location = new RegExp(loc, "i");
+                break;
+            }
+        }
+
+        // Fallback text-based search
+        if (Object.keys(query).length === 0) {
+            query = {
                 $or: [
                     { title: { $regex: lower, $options: "i" } },
                     { description: { $regex: lower, $options: "i" } },
                     { location: { $regex: lower, $options: "i" } },
-                    { category: { $regex: lower, $options: "i" } }  // ✅ added category search
+                    { category: { $regex: lower, $options: "i" } }
                 ]
-            }).limit(3);
+            };
         }
+
+        const listings = await Listing.find(query).limit(3);
 
         if (listings.length === 0) {
             return { type: "text", data: "Sorry, no listings matched your query." };
@@ -260,8 +294,8 @@ async function generateBotReply(message) {
             title: l.title,
             price: l.price,
             location: l.location,
-            image: l.image?.url || "",  // 🛡️ safe access if image missing
-            category: l.category || ""  // optional: you can use this in frontend if needed
+            image: l.image?.url || "",
+            category: l.category || ""
         }));
 
         return { type: "listings", data: structured };
@@ -273,27 +307,17 @@ async function generateBotReply(message) {
 }
 
 
+
 http.listen(8080, () => {
     console.log("⚡ Server with Socket.IO running on port 8080");
 });
 
-// POST Route
 
 
 
 
-// app.get("/testListing", async(req, res) => {
-//     let sampleListing = new Listing({
-//         title: "My New Villa",
-//         description: "By the beach",
-//         price: 1200,
-//         location: "Calangute, Goa",
-//         country: "India",
-//     });
-//     await sampleListing.save();
-//     console.log("sample was saved");
-//     res.send("successful testing");
-// });
+
+
 
 
 
