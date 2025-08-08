@@ -102,6 +102,36 @@
     </a>
   <% } %>
 </div>
+<!-- Chatbot UI -->
+<div id="chat-container" style="position: fixed; bottom: 20px; right: 20px; width: 300px; background: white; border: 1px solid #ccc; border-radius: 10px; box-shadow: 0 0 10px #ccc;">
+  <div id="chat-box" style="height: 200px; overflow-y: auto; padding: 10px;"></div>
+  <input type="text" id="chat-input" placeholder="Ask about listings..." style="width: 100%; border: none; border-top: 1px solid #ccc; padding: 10px;">
+</div>
+
+<script>
+  const input = document.getElementById("chat-input");
+  const box = document.getElementById("chat-box");
+
+  input.addEventListener("keypress", async (e) => {
+    if (e.key === "Enter" && input.value.trim() !== "") {
+      const msg = input.value;
+      box.innerHTML += `<div><b>You:</b> ${msg}</div>`;
+      input.value = "";
+
+      const res = await fetch("/chatbot", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: msg })
+      });
+      const data = await res.json();
+      box.innerHTML += `<div><b>Bot:</b> ${data.reply}</div>`;
+      box.scrollTop = box.scrollHeight;
+    }
+  });
+</script>
+
 
 <script>
   let taxSwitch = document.getElementById("switchCheckDefault");
