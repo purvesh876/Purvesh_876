@@ -9,41 +9,60 @@ module.exports.chatBotHandler = async (req, res) => {
   const userMsg = req.body.message;
 
   const prompt = `
-Extract the category, location, and price if available from this message: "${userMsg}"
-Return JSON like this:
-{ "category": "...", "location": "...", "maxPrice": ... }
-If anything is missing, use null.
+You are a helpful assistant for a travel listing website. 
+Extract the "category", "location", and "maxPrice" (in rupees) from the user's message if mentioned.
+
+Examples:
+User: Show me beach resorts in Goa under ₹2000
+→ { "category": "beach resort", "location": "Goa", "maxPrice": 2000 }
+
+User: Looking for something in Manali
+→ { "category": null, "location": "Manali", "maxPrice": null }
+
+Now extract from: "${userMsg}"
 `;
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4",
-    messages: [{ role: "user", content: prompt }],
-  });
-
-  let extracted;
   try {
-    extracted = JSON.parse(response.choices[0].message.content);
-  } catch (e) {
-    return res.json({ reply: "Sorry, I didn't understand that." });
+    const response = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    const content = response.choices[0].message.content.trim();
+
+    let extracted;
+    try {
+      extracted = JSON.parse(content);
+    } catch (e) {
+      console.error("Failed to parse JSON:", content);
+      return res.json({ reply: "Sorry, I didn't understand your request." });
+    }
+
+    const { category, location, maxPrice } = extracted;
+
+    let query = {};
+    if (category) query.category = new RegExp(category, "i");
+    if (location) query.location = new RegExp(location, "i");
+    if (maxPrice) query.price = { $lte: maxPrice };
+
+    const listings = await Listing.find(query).limit(5);
+
+    if (!listings.length) {
+      return res.json({ reply: "Sorry, no listings matched your search." });
+    }
+
+    // Respond with structured listing cards
+    const reply = listings.map(l => ({
+      id: l._id,
+      title: l.title,
+      price: l.price,
+      location: l.location,
+      image: l.image.url || "", // Fallback if image is stored in Cloudinary
+    }));
+
+    res.json({ reply });
+  } catch (err) {
+    console.error("OpenAI error:", err);
+    res.status(500).json({ reply: "Oops! Something went wrong." });
   }
-
-  const { category, location, maxPrice } = extracted;
-
-  let query = {};
-  if (category) query.category = category;
-  if (location) query.location = new RegExp(location, "i");
-  if (maxPrice) query.price = { $lte: maxPrice };
-
-  const listings = await Listing.find(query).limit(3);
-
-  if (listings.length === 0) {
-    return res.json({ reply: "Sorry, no matching listings found." });
-  }
-
-  let reply = "Here are some listings:\n";
-  for (let l of listings) {
-    reply += `🏠 ${l.title} - ₹${l.price}/night - [View](/listings/${l._id})\n`;
-  }
-
-  res.json({ reply });
 };
