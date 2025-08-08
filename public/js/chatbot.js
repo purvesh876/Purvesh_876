@@ -57,7 +57,8 @@ function appendMessage(type, msg) {
     bubble.className = `chat-message ${type}`;
     bubble.textContent = msg;
     chatMessages.appendChild(bubble);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    // chatMessages.scrollTop = chatMessages.scrollHeight;
+    bubble.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Add listing card to chat
@@ -75,6 +76,7 @@ function appendListingCard(listing) {
     `;
 
     chatMessages.appendChild(card);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    // chatMessages.scrollTop = chatMessages.scrollHeight;
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
