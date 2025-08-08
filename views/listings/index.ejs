@@ -102,22 +102,24 @@
     </a>
   <% } %>
 </div>
-<!-- Chatbot UI -->
-<div id="chat-container" style="position: fixed; bottom: 20px; right: 20px; width: 300px; background: white; border: 1px solid #ccc; border-radius: 10px; box-shadow: 0 0 10px #ccc;">
-  <div id="chat-box" style="height: 200px; overflow-y: auto; padding: 10px;"></div>
-  <input type="text" id="chat-input" placeholder="Ask about listings..." style="width: 100%; border: none; border-top: 1px solid #ccc; padding: 10px;">
+
+<div id="chat-container">
+  <div id="chat-box"></div>
+  <input type="text" id="chat-input" placeholder="Ask about listings..." />
 </div>
+
 
 <script>
   const input = document.getElementById("chat-input");
   const box = document.getElementById("chat-box");
 
   input.addEventListener("keypress", async (e) => {
-    if (e.key === "Enter" && input.value.trim() !== "") {
-      const msg = input.value;
-      box.innerHTML += `<div><b>You:</b> ${msg}</div>`;
-      input.value = "";
+  if (e.key === "Enter" && input.value.trim() !== "") {
+    const msg = input.value;
+    box.innerHTML += `<div><strong>You:</strong> ${msg}</div>`;
+    input.value = "";
 
+    try {
       const res = await fetch("/chatbot", {
         method: "POST",
         headers: {
@@ -126,10 +128,21 @@
         body: JSON.stringify({ message: msg })
       });
       const data = await res.json();
-      box.innerHTML += `<div><b>Bot:</b> ${data.reply}</div>`;
+
+      if (data.reply.startsWith("Here are")) {
+        
+        box.innerHTML += `<div><strong>Bot:</strong><br>${data.reply}</div>`;
+      } else {
+        box.innerHTML += `<div><strong>Bot:</strong> ${data.reply}</div>`;
+      }
+
       box.scrollTop = box.scrollHeight;
+    } catch (err) {
+      box.innerHTML += `<div><strong>Bot:</strong> Oops! Something went wrong.</div>`;
     }
-  });
+  }
+});
+
 </script>
 
 

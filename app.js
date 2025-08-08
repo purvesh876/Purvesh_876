@@ -22,6 +22,7 @@ const flash=require("connect-flash");
 const passport=require("passport");
 const LocalStrategy=require("passport-local");
 const User=require("./models/user.js");
+const chatbotRoutes = require("./routes/chatbot");
 
 
 const listingRouter=require("./routes/listing.js");
@@ -122,7 +123,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error.ejs",{message});
 //   res.status(statusCode).send(message);
 });
-
+app.use("/chatbot", chatbotRoutes);
 
 app.get('/', (req, res) => {
   res.redirect('/listings');
