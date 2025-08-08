@@ -40,7 +40,7 @@ module.exports.listingSchema = Joi.object({
     image: Joi.string().allow("", null),
 
     // ✅ Add this line for category validation
-    category: Joi.string().valid('Beach', 'Mountain', 'City', 'Forest', 'Desert', 'Lake', 'Other').required(),
+    category: Joi.string().valid('Adventure', 'Beach', 'Luxury', 'Budget', 'Romantic', 'Mountain','Castle', 'Forest', 'City', 'Other').required(),
 
     
   }).required(),

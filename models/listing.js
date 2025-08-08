@@ -20,7 +20,7 @@ const listingSchema=new Schema({
     country:String,
     category: {
   type: String,
-  enum: ['Adventure', 'Beach', 'Luxury', 'Budget', 'Romantic', 'Mountain', 'Forest', 'City', 'Other'],
+  enum: ['Adventure', 'Beach', 'Luxury', 'Budget', 'Romantic', 'Mountain','Castle', 'Forest', 'City', 'Other'],
   default: 'Other'
 },
 

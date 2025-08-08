@@ -24,12 +24,17 @@
         <label for="category" class="form-label">Category</label>
         <select name="listing[category]" class="form-select" required>
           <option disabled selected value>-- Select Category --</option>
+          <option value="Adventure" <%= listing.category === 'Adventure' ? 'selected' : '' %>>Adventure</option>
           <option value="Beach" <%= listing.category === 'Beach' ? 'selected' : '' %>>Beach</option>
+          <option value="Luxury" <%= listing.category === 'Luxury' ? 'selected' : '' %>>Luxury</option>
+          <option value="Budget" <%= listing.category === 'Budget' ? 'selected' : '' %>>Budget</option>
+          <option value="Romantic" <%= listing.category === 'Romantic' ? 'selected' : '' %>>Romantic</option>
           <option value="Mountain" <%= listing.category === 'Mountain' ? 'selected' : '' %>>Mountain</option>
-          <option value="City" <%= listing.category === 'City' ? 'selected' : '' %>>City</option>
-          <option value="Countryside" <%= listing.category === 'Countryside' ? 'selected' : '' %>>Countryside</option>
           <option value="Forest" <%= listing.category === 'Forest' ? 'selected' : '' %>>Forest</option>
-          <option value="Desert" <%= listing.category === 'Desert' ? 'selected' : '' %>>Desert</option>
+          <option value="City" <%= listing.category === 'City' ? 'selected' : '' %>>City</option>
+          <option value="Other" <%= listing.category === 'Other' ? 'selected' : '' %>>Other</option>
+         
+          
         </select>
         <div class="invalid-feedback">Please choose a valid category</div>
       </div>
