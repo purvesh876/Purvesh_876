@@ -154,12 +154,16 @@ module.exports.initChatSocket = (io) => {
                 const userMsg = msg.toLowerCase();
                 let query = {};
 
-                // --- Category Matching ---
-                const categories = ['beach', 'mountain', 'village'];
-                const matchedCategory = categories.find(cat => userMsg.includes(cat));
-                if (matchedCategory) {
-                    query.category = matchedCategory.charAt(0).toUpperCase() + matchedCategory.slice(1);
-                }
+               
+const allCategories = await Listing.distinct("category"); 
+const userMsgLower = msg.toLowerCase();
+
+const matchedCategory = allCategories.find(cat => userMsgLower.includes(cat.toLowerCase()));
+
+if (matchedCategory) {
+    query.category = matchedCategory; 
+}
+
 
                 // --- Price Matching ---
                 const underMatch = userMsg.match(/(?:under|below|less than)\s*(\d+)/);
