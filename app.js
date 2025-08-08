@@ -193,6 +193,44 @@ io.on('connection', (socket) => {
 //         return "Oops! Something went wrong while searching listings.";
 //     }
 // }
+// async function generateBotReply(message) {
+//     const lower = message.toLowerCase();
+
+//     try {
+//         let listings = [];
+
+//         if (lower.includes("goa")) {
+//             listings = await Listing.find({ location: /goa/i }).limit(3);
+//         } else if (lower.includes("cheap") || lower.includes("budget")) {
+//             listings = await Listing.find({ price: { $lt: 1000 } }).limit(3);
+//         } else {
+//             listings = await Listing.find({
+//                 $or: [
+//                     { title: { $regex: lower, $options: "i" } },
+//                     { description: { $regex: lower, $options: "i" } },
+//                     { location: { $regex: lower, $options: "i" } }
+//                 ]
+//             }).limit(3);
+//         }
+
+//         if (listings.length === 0) {
+//             return { type: "text", data: "Sorry, no listings matched your query." };
+//         }
+
+//         const structured = listings.map(l => ({
+//             title: l.title,
+//             price: l.price,
+//             location: l.location,
+//             image: l.image.url  // ensure this is correct, or adjust for multiple images
+//         }));
+
+//         return { type: "listings", data: structured };
+
+//     } catch (err) {
+//         console.error("Bot MongoDB query failed:", err);
+//         return { type: "text", data: "Oops! Something went wrong while searching listings." };
+//     }
+// }
 async function generateBotReply(message) {
     const lower = message.toLowerCase();
 
@@ -208,7 +246,8 @@ async function generateBotReply(message) {
                 $or: [
                     { title: { $regex: lower, $options: "i" } },
                     { description: { $regex: lower, $options: "i" } },
-                    { location: { $regex: lower, $options: "i" } }
+                    { location: { $regex: lower, $options: "i" } },
+                    { category: { $regex: lower, $options: "i" } }  // ✅ added category search
                 ]
             }).limit(3);
         }
@@ -221,7 +260,8 @@ async function generateBotReply(message) {
             title: l.title,
             price: l.price,
             location: l.location,
-            image: l.image.url  // ensure this is correct, or adjust for multiple images
+            image: l.image?.url || "",  // 🛡️ safe access if image missing
+            category: l.category || ""  // optional: you can use this in frontend if needed
         }));
 
         return { type: "listings", data: structured };
