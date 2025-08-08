@@ -104,44 +104,76 @@
 </div>
 
 <div id="chat-container">
-  <div id="chat-box"></div>
-  <input type="text" id="chat-input" placeholder="Ask about listings..." />
+  <!-- Chatbot Widget -->
+<div id="chat-widget" class="chat-widget shadow">
+    <div class="chat-header bg-danger text-white d-flex justify-content-between align-items-center px-3 py-2">
+        <span>Ask AirHub Bot</span>
+        <button id="chat-close" class="btn btn-sm text-white">&times;</button>
+    </div>
+    <div id="chat-messages" class="chat-messages px-3 py-2"></div>
+    <div class="chat-input-area d-flex">
+        <input type="text" id="chat-input" class="form-control rounded-0" placeholder="Ask about listings..." />
+        <button id="chat-send" class="btn btn-danger rounded-0">Send</button>
+    </div>
 </div>
 
+<!-- Chat toggle button -->
+<button id="chat-toggle" class="chat-toggle-btn btn btn-danger shadow">💬</button>
+
+ 
 
 <script>
-  const input = document.getElementById("chat-input");
-  const box = document.getElementById("chat-box");
+    const chatWidget = document.getElementById('chat-widget');
+    const chatToggle = document.getElementById('chat-toggle');
+    const chatClose = document.getElementById('chat-close');
+    const chatInput = document.getElementById('chat-input');
+    const chatSend = document.getElementById('chat-send');
+    const chatMessages = document.getElementById('chat-messages');
 
-  input.addEventListener("keypress", async (e) => {
-  if (e.key === "Enter" && input.value.trim() !== "") {
-    const msg = input.value;
-    box.innerHTML += `<div><strong>You:</strong> ${msg}</div>`;
-    input.value = "";
+    chatToggle.addEventListener('click', () => {
+        chatWidget.style.display = 'flex';
+        chatToggle.style.display = 'none';
+    });
 
-    try {
-      const res = await fetch("/chatbot", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ message: msg })
-      });
-      const data = await res.json();
+    chatClose.addEventListener('click', () => {
+        chatWidget.style.display = 'none';
+        chatToggle.style.display = 'inline-block';
+    });
 
-      if (data.reply.startsWith("Here are")) {
-        
-        box.innerHTML += `<div><strong>Bot:</strong><br>${data.reply}</div>`;
-      } else {
-        box.innerHTML += `<div><strong>Bot:</strong> ${data.reply}</div>`;
-      }
-
-      box.scrollTop = box.scrollHeight;
-    } catch (err) {
-      box.innerHTML += `<div><strong>Bot:</strong> Oops! Something went wrong.</div>`;
+    function appendMessage(sender, text) {
+        const msg = document.createElement('p');
+        msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+        chatMessages.appendChild(msg);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-  }
-});
+
+    chatSend.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    function sendMessage() {
+        const userInput = chatInput.value.trim();
+        if (!userInput) return;
+        appendMessage('You', userInput);
+        chatInput.value = '';
+
+        fetch('/chatbot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: userInput })
+        })
+        .then(res => res.json())
+        .then(data => {
+            appendMessage('Bot', data.response || 'Sorry, no response.');
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            appendMessage('Bot', 'Oops! Something went wrong.');
+        });
+    }
+</script>
+
 
 </script>
 

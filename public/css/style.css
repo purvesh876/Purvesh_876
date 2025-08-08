@@ -364,3 +364,82 @@ form img {
   display: none;
 }
 
+/* Chatbot Styles */
+.chat-widget {
+    position: fixed;
+    bottom: 90px;
+    right: 30px;
+    width: 300px;
+    max-height: 450px;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.chat-header {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.chat-messages {
+    height: 300px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+    font-size: 14px;
+}
+
+.chat-input-area {
+    border-top: 1px solid #ddd;
+    padding: 5px;
+}
+
+#chat-input {
+    flex: 1;
+    border: none;
+    padding: 10px;
+    outline: none;
+}
+
+#chat-send {
+    border: none;
+    padding: 0 15px;
+}
+
+.chat-toggle-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    border-radius: 50%;
+    width: 55px;
+    height: 55px;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bot-msg, .user-msg {
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    border-radius: 15px;
+    max-width: 85%;
+    word-wrap: break-word;
+}
+
+.bot-msg {
+    background-color: #eee;
+    align-self: flex-start;
+}
+
+.user-msg {
+    background-color: #d63384;
+    color: white;
+    align-self: flex-end;
+}
+
+
