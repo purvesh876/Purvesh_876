@@ -22,7 +22,9 @@ const flash=require("connect-flash");
 const passport=require("passport");
 const LocalStrategy=require("passport-local");
 const User=require("./models/user.js");
-const chatbotRoutes = require("./routes/chatbot");
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+
 
 
 const listingRouter=require("./routes/listing.js");
@@ -47,7 +49,7 @@ app.use(express.urlencoded({extended:true}));
 app.use(methodOverride("_method"));
 app.engine("ejs",ejsMate);
 app.use(express.static(path.join(__dirname,"/public")));
-app.use(express.json());
+
 
 
 const store=MongoStore.create({
@@ -59,7 +61,7 @@ const store=MongoStore.create({
 
 });
 
-store.on("error",() =>{
+store.on("error",(err) =>{
     console.log("Error in MONGO SESSION STORE",err);
 });
 
@@ -125,15 +127,61 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error.ejs",{message});
 //   res.status(statusCode).send(message);
 });
-app.use("/chatbot", chatbotRoutes);
+
 
 app.get('/', (req, res) => {
   res.redirect('/listings');
 });
 
-app.listen(8080, () => {
-    console.log("server is listening to port 8080");
+
+
+// Socket.IO connection handler
+io.on('connection', (socket) => {
+    console.log("⚡ New user connected");
+
+    // Handle user message
+   socket.on('userMessage', async (msg) => {
+    try {
+        console.log("User:", msg);
+        const reply = await generateBotReply(msg); 
+        socket.emit('botReply', reply);
+    } catch (err) {
+        console.error("⚠️ Error generating bot reply:", err.message);
+        socket.emit('botReply', "Sorry! Something went wrong. Please try again.");
+    }
 });
+
+});
+
+
+async function generateBotReply(message) {
+    const lower = message.toLowerCase();
+
+    // Simple keyword filters
+    if (lower.includes("cheap") || lower.includes("budget")) {
+        const cheapListings = await Listing.find({ price: { $lte: 1000 } }).limit(3);
+        if (cheapListings.length) {
+            return `Here are some budget stays:\n${cheapListings.map(l => `• ${l.title} in ${l.location} for ₹${l.price}`).join("\n")}`;
+        } else {
+            return "Couldn't find listings under ₹1000. Try again later!";
+        }
+    }
+
+    // Search by location
+    const locationMatch = await Listing.find({ location: { $regex: message, $options: "i" } }).limit(3);
+    if (locationMatch.length) {
+        return `Here are stays in ${locationMatch[0].location}:\n${locationMatch.map(l => `• ${l.title} – ₹${l.price}`).join("\n")}`;
+    }
+
+    // Default fallback
+    return "Hi! I'm WanderBot 🤖. Ask me about locations, prices, or categories.";
+}
+
+
+http.listen(8080, () => {
+    console.log("⚡ Server with Socket.IO running on port 8080");
+});
+
 // POST Route
 
 
