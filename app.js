@@ -140,41 +140,95 @@ io.on('connection', (socket) => {
     console.log("⚡ New user connected");
 
     // Handle user message
-   socket.on('userMessage', async (msg) => {
+  socket.on('userMessage', async (msg) => {
     try {
         console.log("User:", msg);
         const reply = await generateBotReply(msg); 
-        socket.emit('botReply', reply);
+        socket.emit('botReply', reply);  // now reply is an object
     } catch (err) {
         console.error("⚠️ Error generating bot reply:", err.message);
-        socket.emit('botReply', "Sorry! Something went wrong. Please try again.");
+        socket.emit('botReply', { type: "text", data: "Sorry! Something went wrong. Please try again." });
     }
 });
 
+
 });
 
 
+// Updated bot logic to query MongoDB
+// async function generateBotReply(message) {
+//     const lower = message.toLowerCase();
+
+//     try {
+//         if (lower.includes("goa")) {
+//             const listings = await Listing.find({ location: /goa/i }).limit(3);
+//             if (listings.length === 0) {
+//                 return "Sorry, I couldn't find listings in Goa.";
+//             }
+
+//             let response = "Here are a few listings in Goa:\n";
+//             listings.forEach(l => {
+//                 response += `• ${l.title} - ₹${l.price}/night\n`;
+//             });
+//             return response;
+//         }
+
+//         if (lower.includes("cheap") || lower.includes("budget")) {
+//             const listings = await Listing.find({ price: { $lt: 1000 } }).limit(3);
+//             if (listings.length === 0) {
+//                 return "No budget listings under ₹1000 were found.";
+//             }
+
+//             let response = "Here are a few budget listings:\n";
+//             listings.forEach(l => {
+//                 response += `• ${l.title} - ₹${l.price}/night\n`;
+//             });
+//             return response;
+//         }
+
+//         return "Hi! I'm WanderBot 🤖. Ask me about locations (like Goa), prices (like cheap or budget), or categories.";
+//     } catch (err) {
+//         console.error("Bot MongoDB query failed:", err);
+//         return "Oops! Something went wrong while searching listings.";
+//     }
+// }
 async function generateBotReply(message) {
     const lower = message.toLowerCase();
 
-    // Simple keyword filters
-    if (lower.includes("cheap") || lower.includes("budget")) {
-        const cheapListings = await Listing.find({ price: { $lte: 1000 } }).limit(3);
-        if (cheapListings.length) {
-            return `Here are some budget stays:\n${cheapListings.map(l => `• ${l.title} in ${l.location} for ₹${l.price}`).join("\n")}`;
+    try {
+        let listings = [];
+
+        if (lower.includes("goa")) {
+            listings = await Listing.find({ location: /goa/i }).limit(3);
+        } else if (lower.includes("cheap") || lower.includes("budget")) {
+            listings = await Listing.find({ price: { $lt: 1000 } }).limit(3);
         } else {
-            return "Couldn't find listings under ₹1000. Try again later!";
+            listings = await Listing.find({
+                $or: [
+                    { title: { $regex: lower, $options: "i" } },
+                    { description: { $regex: lower, $options: "i" } },
+                    { location: { $regex: lower, $options: "i" } }
+                ]
+            }).limit(3);
         }
-    }
 
-    // Search by location
-    const locationMatch = await Listing.find({ location: { $regex: message, $options: "i" } }).limit(3);
-    if (locationMatch.length) {
-        return `Here are stays in ${locationMatch[0].location}:\n${locationMatch.map(l => `• ${l.title} – ₹${l.price}`).join("\n")}`;
-    }
+        if (listings.length === 0) {
+            return { type: "text", data: "Sorry, no listings matched your query." };
+        }
 
-    // Default fallback
-    return "Hi! I'm WanderBot 🤖. Ask me about locations, prices, or categories.";
+        const structured = listings.map(l => ({
+            title: l.title,
+            price: l.price,
+            location: l.location,
+            image: l.image.url  // ensure this is correct, or adjust for multiple images
+        }));
+
+        return { type: "listings", data: structured };
+
+    } catch (err) {
+        console.error("Bot MongoDB query failed:", err);
+        return { type: "text", data: "Oops! Something went wrong while searching listings." };
+    }
 }
 
 
