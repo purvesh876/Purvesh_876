@@ -159,8 +159,9 @@
 
 <script src="/js/map.js"></script> -->
 
+<!-- new one -->
 
-<% layout("/layouts/boilerplate") %>
+<!-- <% layout("/layouts/boilerplate") %>
 <script>
   const mapToken = "<%= process.env.MAP_TOKEN %>";
   const listing = <%- JSON.stringify(listing) %>;
@@ -168,16 +169,16 @@
 
 <div class="container my-5">
   
-  <!-- Title -->
+  
   <div class="text-center mb-4">
     <h1 class="fw-bold text-gradient"><%= listing.title %></h1>
     <p class="text-muted">Hosted by <b><%= listing.owner.username %></b></p>
   </div>
 
-  <!-- Image + Info -->
+  
   <div class="row g-4">
     
-    <!-- Carousel -->
+    
     <div class="col-lg-6">
       <div id="listingCarousel" class="carousel slide shadow rounded-4 overflow-hidden" data-bs-ride="carousel">
         <div class="carousel-inner">
@@ -194,19 +195,20 @@
       </div>
     </div>
 
-    <!-- Info Card -->
+    
     <div class="col-lg-6">
       <div class="p-4 rounded-4 shadow-lg h-100 bg-light">
         <p class="mb-3"><%= listing.description %></p>
 
-        <!-- Price -->
+      
         <div class="mb-3">
-          <span class="fs-4 fw-bold badge rounded-pill bg-gradient text-white px-3 py-2">
+         <span class="fs-4 fw-bold badge rounded-pill bg-gradient-primary text-white px-3 py-2">
+
             ₹<%= listing.price.toLocaleString("en-IN") %>
           </span>
         </div>
 
-        <!-- Location & Category -->
+        
         <div class="d-flex flex-wrap gap-2 mb-4">
           <span class="badge rounded-pill bg-primary">
             <i class="fa-solid fa-location-dot"></i> <%= listing.location %>
@@ -232,7 +234,7 @@
           <% } %>
         </div>
 
-        <!-- Edit/Delete -->
+        
         <% if (currUser && listing.owner._id.equals(currUser._id)) { %>
           <div class="d-flex gap-2">
             <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-primary btn-sm rounded-pill">
@@ -249,7 +251,7 @@
     </div>
   </div>
 
-  <!-- Reviews -->
+  
   <div class="mt-5">
     <hr>
     <% if (currUser) { %>
@@ -298,7 +300,7 @@
     <% } %>
   </div>
 
-  <!-- Map -->
+  
   <div class="mt-5">
     <h4 class="mb-3">Where you'll be</h4>
     <div id="map" class="rounded-4 shadow-sm" style="height: 300px;"></div>
@@ -306,4 +308,199 @@
 </div>
 
 <script src="/js/map.js"></script>
+ -->
 
+
+ <!-- new 2 -->
+
+ <% layout("/layouts/boilerplate") %>
+<script>
+  const mapToken = "<%= process.env.MAP_TOKEN %>";
+  const listing = <%- JSON.stringify(listing) %>;
+</script>
+<style>
+  .text-gradient {
+    background: linear-gradient(45deg, #ff7e5f, #feb47b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .btn-gradient {
+    background: linear-gradient(45deg, #ff7e5f, #feb47b);
+    color: white;
+    border: none;
+  }
+  .btn-gradient:hover { opacity: 0.95; }
+  #map { border: 2px solid #feb47b; }
+  .carousel img { object-fit: cover; }
+  .info-icon { font-size: 1.15rem; }
+  .badge.bg-light { background: #fbfbfc; border: 1px solid #e9ecef; }
+  .badge { font-weight: 600; }
+</style>
+
+<div class="container my-5">
+
+  <!-- Title + Host -->
+  <div class="text-center mb-4">
+    <h1 class="fw-bold text-gradient"><%= listing && listing.title ? listing.title : 'Listing' %></h1>
+    <p class="text-muted">
+      Hosted by <b><%= listing && listing.owner && listing.owner.username ? listing.owner.username : 'Unknown' %></b>
+    </p>
+  </div>
+
+  <div class="row g-4">
+    <!-- Carousel -->
+    <div class="col-lg-6">
+      <div id="listingCarousel" class="carousel slide shadow rounded-4 overflow-hidden" data-bs-ride="carousel">
+        <div class="carousel-inner ratio ratio-4x3">
+          <% if (listing && listing.image && listing.image.url) { %>
+            <div class="carousel-item active">
+              <img src="<%= listing.image.url %>" class="d-block w-100" alt="Listing Image">
+            </div>
+          <% } else { %>
+            <div class="carousel-item active">
+              <img src="https://via.placeholder.com/800x600?text=No+Image" class="d-block w-100" alt="No image">
+            </div>
+          <% } %>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#listingCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#listingCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="col-lg-6">
+      <div class="p-4 rounded-4 shadow-lg h-100 bg-white">
+        <p class="mb-4 text-dark"><%= listing && listing.description ? listing.description : 'No description provided.' %></p>
+
+        <!-- Price -->
+        <div class="d-flex align-items-center mb-3 gap-3">
+          <div class="d-flex align-items-center">
+            <i class="fa-solid fa-rupee-sign info-icon me-2 text-gradient"></i>
+            <span class="fs-4 fw-bold">
+              <%= (listing && listing.price != null) ? '₹' + Number(listing.price).toLocaleString("en-IN") : '—' %>
+            </span>
+          </div>
+        </div>
+
+        <!-- Location / Country / Category -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          <% if (listing && listing.location) { %>
+            <span class="badge rounded-pill bg-light border text-dark d-inline-flex align-items-center">
+              <i class="fa-solid fa-location-dot me-2 text-primary"></i> <%= listing.location %>
+            </span>
+          <% } %>
+
+          <% if (listing && listing.country) { %>
+            <span class="badge rounded-pill bg-light border text-dark d-inline-flex align-items-center">
+              <i class="fa-solid fa-earth-asia me-2 text-success"></i> <%= listing.country %>
+            </span>
+          <% } %>
+
+          <% if (listing && listing.category) { 
+               var emoji = "📍";
+               switch (listing.category) {
+                 case "Beach": emoji = "🏖️"; break;
+                 case "Mountain": emoji = "🌄"; break;
+                 case "Forest": emoji = "🌲"; break;
+                 case "Desert": emoji = "🏜️"; break;
+                 case "City": emoji = "🏙️"; break;
+                 case "Village": emoji = "🌾"; break;
+                 case "Snow": emoji = "❄️"; break;
+               }
+          %>
+            <span class="badge rounded-pill bg-light border text-dark d-inline-flex align-items-center">
+              <i class="fa-solid fa-tags me-2 text-info"></i> <%= emoji %> <%= listing.category %>
+            </span>
+          <% } %>
+        </div>
+
+        <!-- Owner Actions -->
+        <% if (currUser && listing && listing.owner && String(listing.owner._id) === String(currUser._id)) { %>
+          <div class="d-flex gap-2">
+            <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-primary btn-sm rounded-pill">
+              <i class="fa-solid fa-pen me-1"></i> Edit
+            </a>
+            <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" onsubmit="return confirm('Delete this listing?');">
+              <button class="btn btn-outline-danger btn-sm rounded-pill">
+                <i class="fa-solid fa-trash me-1"></i> Delete
+              </button>
+            </form>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviews -->
+  <div class="mt-5">
+    <hr>
+    <% if (currUser) { %>
+      <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+        <h4 class="mb-3">Leave a Review</h4>
+        <form action="/listings/<%= listing._id %>/reviews" method="POST" novalidate class="needs-validation">
+          <div class="mb-3">
+            <label class="form-label">Rating</label>
+            <fieldset class="starability-slot">
+              <% for (var i = 1; i <= 5; i++) { %>
+                <input type="radio" id="rate-<%= i %>" name="review[rating]" value="<%= i %>">
+                <label for="rate-<%= i %>" title="<%= i %> star"><%= i %> star</label>
+              <% } %>
+            </fieldset>
+          </div>
+          <div class="mb-3">
+            <label for="comment" class="form-label">Comments</label>
+            <textarea name="review[comment]" id="comment" class="form-control" rows="4" required></textarea>
+            <div class="invalid-feedback">Please add a comment.</div>
+          </div>
+          <button class="btn btn-gradient rounded-pill">Submit</button>
+        </form>
+      </div>
+    <% } %>
+
+    <% if (listing && listing.reviews && listing.reviews.length > 0) { %>
+      <h5 class="mb-3">All Reviews</h5>
+      <div class="row g-3">
+        <% for (var r = 0; r < listing.reviews.length; r++) {
+             var review = listing.reviews[r]; %>
+          <div class="col-md-6">
+            <div class="card shadow-sm border-0 rounded-4">
+              <div class="card-body">
+                <h6 class="fw-bold"><%= review && review.author && review.author.username ? review.author.username : 'User' %></h6>
+                <p class="starability-result" data-rating="<%= review.rating %>">
+                  <% for (var s = 0; s < (review.rating || 0); s++) { %>★<% } %>
+                </p>
+                <p><%= review.comment %></p>
+                <% if (currUser && review && review.author && String(currUser._id) === String(review.author._id)) { %>
+                  <div class="text-end">
+                    <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                      <button class="btn btn-sm btn-outline-danger rounded-pill">Delete</button>
+                    </form>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    <% } else { %>
+      <p class="text-muted">No reviews yet.</p>
+    <% } %>
+  </div>
+
+  <!-- Map -->
+  <div class="mt-5">
+    <h4 class="mb-3">Where you'll be</h4>
+    <div id="map" class="rounded-4 shadow-sm" style="height: 300px;"></div>
+  </div>
+</div>
+
+
+
+
+<script src="/js/map.js"></script>
