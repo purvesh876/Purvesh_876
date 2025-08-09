@@ -136,6 +136,59 @@
 }
 
 
+
+
+/* Collapse content stacks vertically on small screens */
+@media (max-width: 767.98px) {
+  #navbarNavAltMarkup {
+    flex-direction: column !important;
+    align-items: flex-start;
+  }
+
+  #navbarNavAltMarkup .navbar-nav {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  /* Make search form full width and smaller */
+  form.search-bar {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
+  form.search-bar input {
+    width: 70%;
+    min-width: 0;
+  }
+  form.search-bar button {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  /* Auth buttons container stack vertically */
+  .nav-auth {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    width: 100%;
+  }
+
+  .nav-auth a {
+    width: 100%;
+    text-align: center;
+    font-size: 1rem !important;
+    padding: 0.5rem 0;
+  }
+
+  /* Make brand and toggler align horizontally with some spacing */
+  .navbar-brand {
+    flex: 1;
+  }
+  .navbar-toggler {
+    z-index: 1100;
+  }
+}
+
+
 </style>
 
 <nav class="navbar navbar-expand-md navbar-custom sticky-top">
