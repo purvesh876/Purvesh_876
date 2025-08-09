@@ -149,7 +149,7 @@
     background-color: #ff4b2b;
     color: white;
   }
-   @media (max-width: 576px) {
+   /* @media (max-width: 576px) {
     .row-cols-sm-3 {
       grid-template-columns: repeat(1, 1fr);
     }
@@ -179,7 +179,56 @@
     .listing-image {
       height: 20rem;
     }
+  } */
+   /* Responsive grid for cards */
+@media (max-width: 576px) {
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
   }
+  .row-cols-sm-3,
+  .listing-card {
+    flex: 1 1 100%; /* Stacks all items vertically */
+  }
+  .listing-image {
+    height: 15rem; /* Smaller height for mobile images */
+  }
+  .listing-card {
+    margin-bottom: 15px;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  .row-cols-sm-3,
+  .listing-card {
+    flex: 1 1 48%; /* Two items per row */
+  }
+  .listing-image {
+    height: 18rem; /* Adjust image size for tablets */
+  }
+}
+
+@media (min-width: 769px) {
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .row-cols-lg-3,
+  .listing-card {
+    flex: 1 1 32%; /* Three items per row */
+  }
+  .listing-image {
+    height: 20rem; /* Default image size for large screens */
+  }
+}
+
 </style>
 
 <div id="filters">
@@ -237,19 +286,7 @@
   </div>
 </div>
 
-<!-- <script>
-  let taxSwitch = document.getElementById("switchCheckDefault");
-  taxSwitch.addEventListener("click", () => {
-    let taxInfo = document.getElementsByClassName("tax-info");
-    for (info of taxInfo) {
-      if (info.style.display != "inline") {
-        info.style.display = "inline";
-      } else {
-        info.style.display = "none";
-      }
-    }
-  });
-</script> -->
+
 <script>
 // On page load: store the base price in data attribute for each listing card
 document.addEventListener("DOMContentLoaded", () => {
