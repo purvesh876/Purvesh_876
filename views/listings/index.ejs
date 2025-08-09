@@ -251,6 +251,18 @@
   });
 </script> -->
 <script>
+// On page load: store the base price in data attribute for each listing card
+document.addEventListener("DOMContentLoaded", () => {
+  let listingCards = document.querySelectorAll('.listing-card');
+  listingCards.forEach(card => {
+    let priceElement = card.querySelector('.badge-price');
+    let basePrice = parseFloat(priceElement.textContent.replace('₹', '').replace(' / night', '').replace(',', ''));
+    // Store the base price as a data attribute on the card
+    card.setAttribute('data-base-price', basePrice);
+  });
+});
+
+// Toggle event for changing price with or without GST
 let taxSwitch = document.getElementById("switchCheckDefault");
 
 taxSwitch.addEventListener("change", () => {
@@ -258,8 +270,8 @@ taxSwitch.addEventListener("change", () => {
 
   listingCards.forEach(card => {
     let priceElement = card.querySelector('.badge-price');
-    let basePrice = parseFloat(priceElement.textContent.replace('₹', '').replace(' / night', '').replace(',', ''));
-
+    let basePrice = parseFloat(card.getAttribute('data-base-price')); // Get base price from data attribute
+    
     let taxRate = 0.18; // 18% GST
     let totalPrice = basePrice * (1 + taxRate); // Calculate price with GST
     let totalPriceFormatted = `₹${totalPrice.toLocaleString("en-IN")} / night`; // Format the price
@@ -272,6 +284,7 @@ taxSwitch.addEventListener("change", () => {
   });
 });
 </script>
+
 
 
 <script src="/socket.io/socket.io.js"></script>
