@@ -352,3 +352,102 @@ form img {
 .listing-card-body {
     padding-top: 5px;
 }
+
+
+/* Ensure the body flex layout doesn't break on small screens */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Container fills remaining space */
+.container {
+  flex: 1 1 auto;
+  padding: 0 1rem; /* Add some horizontal padding on small devices */
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Navbar tweaks for mobile */
+@media (max-width: 768px) {
+  .navbar {
+    height: auto;
+    padding: 0.5rem 1rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-link {
+    font-size: 0.9rem;
+  }
+}
+
+/* Footer flex stacking on mobile */
+@media (max-width: 768px) {
+  .f-info-links,
+  .f-info-socials,
+  .f-info-brand {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Buttons group wrap vertically on small screens */
+@media (max-width: 576px) {
+  .btns {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Images & cards scaling on mobile */
+@media (max-width: 576px) {
+  .show-img {
+    height: 200px;
+    width: 100%;
+  }
+
+  .card-image-top {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+  }
+}
+
+/* Chat window responsive tweaks (in addition to index.ejs) */
+@media (max-width: 400px) {
+  #chat-window {
+    width: 90vw !important;
+    right: 5vw !important;
+    bottom: 80px !important;
+  }
+}
+
+/* Listing cards max width and margin on small screens */
+@media (max-width: 575px) {
+  .listing-card {
+    margin-bottom: 1.5rem;
+    max-width: 100%;
+  }
+}
+
+/* Typography adjustments */
+@media (max-width: 576px) {
+  .nav-link,
+  .filter p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Ensure carousel images scale nicely */
+.carousel-inner img {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .carousel-inner img {
+    max-height: 250px;
+  }
+}
