@@ -1,4 +1,4 @@
-<% layout("/layouts/boilerplate") %>
+ <!-- <% layout("/layouts/boilerplate") %>
 
 
 <style>
@@ -160,7 +160,7 @@
 
 
  
-<!-- Chat Bubble + Chat Window -->
+
 <div id="chat-bubble">
   <i class="fas fa-comment-dots"></i>
 </div>
@@ -203,5 +203,227 @@
 </script>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="/js/chatbot.js"></script>
+<script src="/js/chatbot.js"></script> -->
 
+
+<% layout("/layouts/boilerplate") %>
+
+<style>
+  /* Floating chat bubble */
+  #chat-bubble {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    padding: 15px;
+    cursor: pointer;
+    z-index: 1050;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  #chat-bubble i {
+    font-size: 24px;
+  }
+
+  /* Chat window */
+  #chat-window {
+    position: fixed;
+    bottom: 90px;
+    right: 30px;
+    width: 300px;
+    max-height: 400px;
+    display: none;
+    flex-direction: column;
+    z-index: 1051;
+  }
+
+  #chat-messages {
+    height: 250px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+  }
+
+  .chat-message {
+    margin: 5px 0;
+  }
+
+  .user-message {
+    text-align: right;
+    color: #007bff;
+  }
+
+  .bot-message {
+    text-align: left;
+    color: #28a745;
+  }
+
+  /* Category Bar */
+  #filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+  }
+  .filter {
+    text-align: center;
+    margin: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .filter:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+  }
+  .filter p {
+    font-size: 0.8rem;
+    margin: 5px 0 0 0;
+  }
+  .tax-info {
+    display: none;
+  }
+  .tax-toggle {
+    border: 1px solid black;
+    border-radius: 1rem;
+    height: 3.5rem;
+    padding: 1rem;
+    margin-left: 1rem;
+    display: flex;
+    align-items: center;
+    background: white;
+  }
+
+  /* Card Styles */
+  .listing-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0px 4px 20px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+  }
+  .listing-card:hover {
+    transform: translateY(-5px);
+  }
+  .listing-image {
+    width: 100%;
+    height: 20rem;
+    object-fit: cover;
+    display: block;
+  }
+  .gradient-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+  }
+  .listing-title {
+    position: absolute;
+    bottom: 10px;
+    left: 15px;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    z-index: 2;
+  }
+  .badge-price, .badge-category {
+    position: absolute;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    border-radius: 12px;
+    font-weight: bold;
+    z-index: 2;
+  }
+  .badge-category {
+    top: 10px;
+    left: 10px;
+    background-color: rgba(255,255,255,0.9);
+    color: #333;
+  }
+  .badge-price {
+    bottom: 10px;
+    right: 10px;
+    background-color: #ff4b2b;
+    color: white;
+  }
+</style>
+
+<div id="filters">
+  <a href="/listings?category=Adventure" class="filter" style="background:linear-gradient(45deg,#ff6a00,#ee0979)"><i class="fa-solid fa-fire"></i><p>Adventure</p></a>
+  <a href="/listings?category=Beach" class="filter" style="background:linear-gradient(45deg,#00c6ff,#0072ff)"><i class="fa-solid fa-person-swimming"></i><p>Beach</p></a>
+  <a href="/listings?category=Luxury" class="filter" style="background:linear-gradient(45deg,#ff9a9e,#fad0c4)"><i class="fa-regular fa-gem"></i><p>Luxury</p></a>
+  <a href="/listings?category=Budget" class="filter" style="background:linear-gradient(45deg,#f7971e,#ffd200)"><i class="fa-solid fa-hand-holding-dollar"></i><p>Budget</p></a>
+  <a href="/listings?category=Romantic" class="filter" style="background:linear-gradient(45deg,#ff5f6d,#ffc371)"><i class="fa-brands fa-gratipay"></i><p>Romantic</p></a>
+  <a href="/listings?category=Mountain" class="filter" style="background:linear-gradient(45deg,#11998e,#38ef7d)"><i class="fa-solid fa-mountain"></i><p>Mountain</p></a>
+  <a href="/listings?category=Castle" class="filter" style="background:linear-gradient(45deg,#8360c3,#2ebf91)"><i class="fa-brands fa-fort-awesome"></i><p>Castle</p></a>
+  <a href="/listings?category=Temple" class="filter" style="background:linear-gradient(45deg,#ff9966,#ff5e62)"><i class="fa-solid fa-gopuram"></i><p>Temple</p></a>
+  <a href="/listings?category=Forest" class="filter" style="background:linear-gradient(45deg,#56ab2f,#a8e063)"><i class="fa-solid fa-tree"></i><p>Forest</p></a>
+  <a href="/listings?category=City" class="filter" style="background:linear-gradient(45deg,#00b09b,#96c93d)"><i class="fa-solid fa-city"></i><p>City</p></a>
+
+  <div class="tax-toggle">
+    <div class="form-check-reverse form-switch">
+      <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
+      <label class="form-check-label" for="switchCheckDefault">Display total after taxes</label>
+    </div>
+  </div>
+</div>
+
+<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-3 mt-3">
+  <% for (let listing of allListings) { %>
+    <a href="/listings/<%= listing._id %>" class="col mb-4 listing-link" style="text-decoration:none;">
+      <div class="listing-card">
+        <img src="<%= listing.image.url %>" alt="<%= listing.title %>" class="listing-image">
+        <div class="gradient-overlay"></div>
+        <span class="badge-category"><%= listing.category %></span>
+        <span class="badge-price">&#8377;<%= listing.price.toLocaleString("en-IN") %> / night</span>
+        <h3 class="listing-title"><%= listing.title %></h3>
+      </div>
+    </a>
+  <% } %>
+</div>
+
+<!-- Chat Bubble + Chat Window -->
+<div id="chat-bubble">
+  <i class="fas fa-comment-dots"></i>
+</div>
+
+<div id="chat-window" class="card shadow">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><strong>Ask SmartBot</strong></span>
+    <button id="close-chat" class="btn btn-sm btn-outline-danger">✕</button>
+  </div>
+  <div class="card-body" id="chat-messages">
+    <div class="text-muted text-center small">Ask anything about listings</div>
+  </div>
+  <div class="card-footer">
+    <div class="input-group">
+      <input type="text" id="chat-input" class="form-control" placeholder="Type your question...">
+      <button id="send-button" class="btn btn-primary">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let taxSwitch = document.getElementById("switchCheckDefault");
+  taxSwitch.addEventListener("click", () => {
+    let taxInfo = document.getElementsByClassName("tax-info");
+    for (info of taxInfo) {
+      if (info.style.display != "inline") {
+        info.style.display = "inline";
+      } else {
+        info.style.display = "none";
+      }
+    }
+  });
+</script>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/chatbot.js"></script>
