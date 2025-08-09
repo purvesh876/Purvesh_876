@@ -1,209 +1,4 @@
- <!-- <% layout("/layouts/boilerplate") %>
-
-
-<style>
-  /* Floating chat bubble */
-  #chat-bubble {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background-color: #007bff;
-    color: white;
-    border-radius: 50%;
-    padding: 15px;
-    cursor: pointer;
-    z-index: 1050;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  }
-  #chat-bubble i {
-    font-size: 24px;
-  }
-
-  /* Chat window */
-  #chat-window {
-    position: fixed;
-    bottom: 90px;
-    right: 30px;
-    width: 300px;
-    max-height: 400px;
-    display: none;
-    flex-direction: column;
-    z-index: 1051;
-  }
-
-  #chat-messages {
-    height: 250px;
-    overflow-y: auto;
-    margin-bottom: 10px;
-  }
-
-  .chat-message {
-    margin: 5px 0;
-  }
-
-  .user-message {
-    text-align: right;
-    color: #007bff;
-  }
-
-  .bot-message {
-    text-align: left;
-    color: #28a745;
-  }
-</style>
-
-
-
-<style>
-  #filters {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .filter {
-    text-align: center;
-    margin-right: 2rem;
-    margin-top: 2rem;
-    opacity: 0.7;
-    text-decoration: none;
-    color: inherit;
-  }
-  .filter:hover {
-    opacity: 1;
-    cursor: pointer;
-  }
-  .filter p {
-    font-size: 0.8rem;
-  }
-  .tax-info {
-    display: none;
-  }
-  .tax-toggle {
-    border: 1px solid black;
-    border-radius: 1rem;
-    height: 3.5rem;
-    padding: 1rem;
-    margin-left: 8rem;
-    display: flex;
-    align-items: center;
-  }
-</style>
-
-<div id="filters">
-  <a href="/listings?category=Adventure" class="filter">
-    <div><i class="fa-solid fa-fire"></i></div>
-    <p>Adventure</p>
-  </a>
-  <a href="/listings?category=Beach" class="filter">
-    <div><i class="fa-solid fa-person-swimming"></i></div>
-    <p>Beach</p>
-  </a>
-  <a href="/listings?category=Luxury" class="filter">
-    <div><i class="fa-regular fa-gem"></i></div>
-    <p>Luxury</p>
-  </a>
-  <a href="/listings?category=Budget" class="filter">
-    <div><i class="fa-solid fa-hand-holding-dollar"></i></div>
-    <p>Budget</p>
-  </a>
-  <a href="/listings?category=Romantic" class="filter">
-    <div><i class="fa-brands fa-gratipay"></i></div>
-    <p>Romantic</p>
-  </a>
-  <a href="/listings?category=Mountain" class="filter">
-    <div><i class="fa-solid fa-mountain"></i></div>
-    <p>Mountain</p>
-  </a>
-  <a href="/listings?category=Castle" class="filter">
-    <div><i class="fa-brands fa-fort-awesome"></i></div>
-    <p>Castle</p>
-  </a>
-  <a href="/listings?category=Temple" class="filter">
-    <div><i class="fa-solid fa-gopuram"></i></div>
-    <p>Temple</p>
-  </a>
-  <a href="/listings?category=Forest" class="filter">
-    <div><i class="fa-solid fa-tree"></i></div>
-    <p>Forest</p>
-  </a>
-  <a href="/listings?category=City" class="filter">
-    <div><i class="fa-solid fa-city"></i></div>
-    <p>City</p>
-  </a>
-
-  <div class="tax-toggle">
-    <div class="form-check-reverse form-switch">
-      <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
-      <label class="form-check-label" for="switchCheckDefault">Display total after taxes</label>
-    </div>
-  </div>
-</div>
-
-<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-3 mt-3">
-  <% for (let listing of allListings) { %>
-    <a href="/listings/<%= listing._id %>" class="listing-link">
-      <div class="card col listing-card">
-        <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image" style="height: 20rem;">
-        <div class="card-img-overlay"></div>
-        <div class="card-body">
-          <p class="card-text">
-            <b><%= listing.title %></b> <br>
-            &#8377;<%= listing.price.toLocaleString("en-IN") %> / night
-            <i class="tax-info"> &nbsp; &nbsp; +18% GST</i>
-          </p>
-        </div>
-      </div>
-    </a>
-  <% } %>
-</div>
-
-
-
  
-
-<div id="chat-bubble">
-  <i class="fas fa-comment-dots"></i>
-</div>
-
-<div id="chat-window" class="card shadow">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <span><strong>Ask SmartBot</strong></span>
-    <button id="close-chat" class="btn btn-sm btn-outline-danger">✕</button>
-  </div>
-  <div class="card-body" id="chat-messages">
-    <div class="text-muted text-center small">Ask anything about listings</div>
-  </div>
-  <div class="card-footer">
-    <div class="input-group">
-  <input type="text" id="chat-input" class="form-control" placeholder="Type your question...">
-  <button id="send-button" class="btn btn-primary">Send</button>
-</div>
-
-  </div>
-</div>
-
-
-
-
-
-
-
-<script>
-  let taxSwitch = document.getElementById("switchCheckDefault");
-  taxSwitch.addEventListener("click", () => {
-    let taxInfo = document.getElementsByClassName("tax-info");
-    for (info of taxInfo) {
-      if (info.style.display != "inline") {
-        info.style.display = "inline";
-      } else {
-        info.style.display = "none";
-      }
-    }
-  });
-</script>
-
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/chatbot.js"></script> -->
 
 
 <% layout("/layouts/boilerplate") %>
@@ -354,6 +149,37 @@
     background-color: #ff4b2b;
     color: white;
   }
+   @media (max-width: 576px) {
+    .row-cols-sm-3 {
+      grid-template-columns: repeat(1, 1fr);
+    }
+    .listing-image {
+      height: 15rem;
+    }
+    .listing-card {
+      margin-bottom: 15px;
+    }
+    .tax-toggle {
+      margin-left: 0;
+      margin-top: 1rem;
+    }
+  }
+  @media (min-width: 577px) and (max-width: 768px) {
+    .row-cols-sm-3 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .listing-image {
+      height: 18rem;
+    }
+  }
+  @media (min-width: 769px) {
+    .row-cols-lg-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .listing-image {
+      height: 20rem;
+    }
+  }
 </style>
 
 <div id="filters">
@@ -411,7 +237,7 @@
   </div>
 </div>
 
-<script>
+<!-- <script>
   let taxSwitch = document.getElementById("switchCheckDefault");
   taxSwitch.addEventListener("click", () => {
     let taxInfo = document.getElementsByClassName("tax-info");
@@ -423,7 +249,30 @@
       }
     }
   });
+</script> -->
+<script>
+let taxSwitch = document.getElementById("switchCheckDefault");
+
+taxSwitch.addEventListener("change", () => {
+  let listingCards = document.querySelectorAll('.listing-card');
+
+  listingCards.forEach(card => {
+    let priceElement = card.querySelector('.badge-price');
+    let basePrice = parseFloat(priceElement.textContent.replace('₹', '').replace(' / night', '').replace(',', ''));
+
+    let taxRate = 0.18; // 18% GST
+    let totalPrice = basePrice * (1 + taxRate); // Calculate price with GST
+    let totalPriceFormatted = `₹${totalPrice.toLocaleString("en-IN")} / night`; // Format the price
+
+    if (taxSwitch.checked) {
+      priceElement.textContent = totalPriceFormatted; // Show price with tax
+    } else {
+      priceElement.textContent = `₹${basePrice.toLocaleString("en-IN")} / night`; // Show base price
+    }
+  });
+});
 </script>
+
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/chatbot.js"></script>
