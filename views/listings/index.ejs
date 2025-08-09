@@ -481,6 +481,66 @@ taxSwitch.addEventListener("change", () => {
       font-size: 20px;
     }
   }
+  /* Make listing title wrap nicely */
+.listing-title {
+  position: absolute;
+  bottom: 40px;   /* move title a bit higher to leave space for price */
+  left: 15px;
+  right: 15px;    /* constrain title width */
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  z-index: 2;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-height: 3.6rem; /* ~2 lines max */
+  line-height: 1.8rem;
+}
+
+/* Adjust price badge position */
+.badge-price {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: #ff4b2b;
+  color: white;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  border-radius: 12px;
+  font-weight: bold;
+  z-index: 2;
+  white-space: nowrap; /* prevent price from breaking into multiple lines */
+}
+
+/* Adjust category badge to top-left */
+.badge-category {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #333;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  border-radius: 12px;
+  font-weight: bold;
+  z-index: 2;
+  white-space: nowrap;
+}
+
+/* For small screens, reduce font size of title and badges */
+@media (max-width: 576px) {
+  .listing-title {
+    font-size: 1rem;
+    bottom: 36px;
+    max-height: 2.7rem; /* about 1.5 lines */
+  }
+  .badge-price,
+  .badge-category {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+}
+
 </style>
 
 <div id="filters">
